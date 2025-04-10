@@ -1,2 +1,1 @@
-# calculator-tkinter
-A feature-rich GUI calculator built using Python's Tkinter, with plans for keyboard input, history, themes, and more
+This is a beginner-friendly but extensible calculator application built with Python's Tkinter library. Initially developed with support for basic arithmetic operations, the project is designed to evolve through continuous updates and feature additions. Upcoming enhancements include keyboard input support, a history panel, dark/light theme toggle, decimal handling, and more. Ideal for learners exploring GUI development and Python event handling.
