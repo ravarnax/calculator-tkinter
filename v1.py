@@ -28,12 +28,18 @@ def on_click(event):
     btn_text = event.widget['text']
     handle_input(btn_text)
     
+# handle keyboard input (Enter key)
+def on_enter(event):
+    handle_input('=')
+    
 
 # Create Entry field
 screen = StringVar()
 entry = Entry(root, textvar=screen, font='Helvetica 20', bd=10, relief=RIDGE, justify='right')
 entry.pack(fill='both', padx=10, pady=10, ipadx=8)
 entry.focus_set()   # direct focus to the widget   
+
+entry.bind("<Return>", on_enter)
 
 # button layout
 buttons = [
