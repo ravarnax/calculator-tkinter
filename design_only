@@ -1,0 +1,131 @@
+# importing modules
+from tkinter import *
+import re
+
+# create main_window
+root = Tk()
+root.title("Calculator using TKinter")
+root.geometry("290x520")
+root.resizable(False, False)
+root.configure(bg='#ffffff')  # Background pure white
+
+# Central input handler
+def handle_input(value):
+    current_text = screen.get()
+    if value == '=':
+        try:
+            # Replace ^ with ** for power
+            current_text = current_text.replace('^', '**')
+            screen.set(str(eval(current_text)))
+        except:
+            screen.set("Error")
+    elif value == 'C':
+        screen.set("")
+    elif value == '◀':
+        current_text = current_text[:-1]
+        screen.set(current_text)
+    elif value == '%':
+        match = re.search(r'(\d+\.?\d*)$', current_text)
+        if match:
+            last_number = match.group(1)
+            percent_value = str(float(last_number)/100)
+            new_text = current_text[:match.start()] + percent_value
+            screen.set(new_text)
+    elif value == 'π':
+        screen.set(current_text + str(3.141592653589793))
+    elif value == '.':
+        last_number = re.split(r'[+\-*/]', current_text)[-1]
+        if '.' not in last_number:
+            screen.set(current_text + '.')
+    else:
+        screen.set(current_text + value)
+        
+    # move cursor at end of new insertion
+    entry.icursor(END)
+
+def on_button_click(value):
+    handle_input(value)
+
+# Entry field
+screen = StringVar()
+entry = Entry(root, textvar=screen, font='Arial 24', bd=0,
+              relief=FLAT, justify='right', bg='#f7f7f7', fg='#333333')
+entry.place(x=10, y=20, width=275, height=60)
+entry.focus_set()
+
+entry.bind('<KeyPress-%>', lambda e: handle_input('%') or 'break')
+
+# Create rounded buttons
+def create_rounded_button(parent, text, x, y, width, height, r, color, text_color):
+    btn = Canvas(parent, width=width, height=height, bg=root['bg'], highlightthickness=0)
+    btn.place(x=x, y=y)
+    
+    def draw_button(bg):
+        btn.delete("all")  # Clear previous drawing
+        btn.create_arc((0, 0, r*2, r*2), start=90, extent=90, fill=bg, outline=bg)
+        btn.create_arc((width-r*2, 0, width, r*2), start=0, extent=90, fill=bg, outline=bg)
+        btn.create_arc((0, height-r*2, r*2, height), start=180, extent=90, fill=bg, outline=bg)
+        btn.create_arc((width-r*2, height-r*2, width, height), start=270, extent=90, fill=bg, outline=bg)
+        btn.create_rectangle((r, 0, width-r, height), fill=bg, outline=bg)
+        btn.create_rectangle((0, r, width, height-r), fill=bg, outline=bg)
+        btn.create_text(width/2, height/2, text=text, font=('Arial', 18), fill=text_color)
+
+    # Initial drawing
+    draw_button(color)
+    
+    # Bind click
+    btn.bind("<Button-1>", lambda e: on_button_click(text))
+    
+    # Hover effect
+    btn.bind("<Enter>", lambda e: draw_button('#f9f9f9'))  # Lighter shade on hover
+    btn.bind("<Leave>", lambda e: draw_button(color))       # Original color back
+
+    return btn
+
+
+# Buttons layout
+buttons = [ 
+           ['^', 'π', 'C', '◀'],
+           ['(', ')', '%', '/'],
+           ['7', '8', '9', '*'],
+           ['4', '5', '6', '+'],
+           ['1', '2', '3', '-'],
+           ['0', '00', '.', '=']
+         ]
+
+# Create buttons
+button_color = '#f0f0f0'
+operator_color = '#e5e5e5'
+special_color = '#eaeaea'
+equal_color = '#dddddd'
+text_color = '#333333'
+
+start_x = 10
+start_y = 100
+button_width = 60
+button_height = 60
+radius = 15
+padding = 10
+
+for i, row in enumerate(buttons):
+    for j, btn_text in enumerate(row):
+        if btn_text in {'/', '*', '-', '+', '^'}:
+            bg_color = operator_color
+        elif btn_text in {'C', '◀', '%', 'π'}:
+            bg_color = special_color
+        elif btn_text == '=':
+            bg_color = equal_color
+        else:
+            bg_color = button_color
+
+        # Calculate position
+        x = start_x + j*(button_width + padding)
+        y = start_y + i*(button_height + padding)
+        
+        create_rounded_button(root, btn_text, x, y, button_width, button_height, radius, bg_color, text_color)
+
+# Bind Enter key
+root.bind('<Return>', lambda event: handle_input('='))
+
+# Run application
+root.mainloop()
